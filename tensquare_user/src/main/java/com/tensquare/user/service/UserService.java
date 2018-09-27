@@ -2,6 +2,7 @@ package com.tensquare.user.service;
 
 import com.tensquare.user.dao.UserDao;
 import com.tensquare.user.pojo.User;
+import entity.Result;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import util.IdWorker;
 
@@ -38,6 +40,8 @@ public class UserService {
 	private RedisTemplate redisTemplate;
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	@Autowired
+	private BCryptPasswordEncoder encoder;
 
 	/**
 	 * 查询全部列表
@@ -87,6 +91,8 @@ public class UserService {
 	 */
 	public void add(User user) {
 		user.setId( idWorker.nextId()+"" );
+		//给密码进行加密
+		user.setPassword(encoder.encode(user.getPassword()));
 		userDao.save(user);
 	}
 
@@ -202,5 +208,24 @@ public class UserService {
 			user.setFollowcount(0);
 			this.add(user);
 		}
+	}
+
+	/**
+	 * 用户登录
+	 * 1.先检查用户是否存在
+	 * 2.检查密码是否正确
+	 * 826252
+	 * @param user
+	 * @return
+	 */
+	public User login(User user) {
+		User loginUser = userDao.findByMobile(user.getMobile());
+		if(loginUser==null){
+			throw new RuntimeException("该用户不存在");
+		}
+		if(loginUser.getMobile()!=null&&encoder.matches(user.getPassword(),loginUser.getPassword())){
+			return loginUser;
+		}
+		return null;
 	}
 }

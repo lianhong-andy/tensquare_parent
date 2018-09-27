@@ -3,6 +3,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
+import com.sun.prism.shader.Mask_TextureSuper_AlphaTest_Loader;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -140,6 +141,18 @@ public class UserController {
 	public Result add(@PathVariable String code,@RequestBody User user){
 		userService.register(code,user);
 		return new Result(true,StatusCode.OK,"注册成功");
+	}
+
+	/**
+	 * 用户登录
+	 */
+	@RequestMapping(value = "/login",method = RequestMethod.POST)
+	public Result login(@RequestBody User user){
+		user = userService.login(user);
+		if(user==null){
+			return new Result(false,StatusCode.LOGINERROR,"登录失败");
+		}
+		return new Result(true,StatusCode.OK,"登录成功");
 	}
 
 	

@@ -21,3 +21,7 @@ aliyun:
     AccessKeySecret: CZEjPtmIGT44A1PlLTY0uhztQf9gBC
     sign_name: 练宏
     template_code: SMS_142616397
+jwt:
+  config:
+    key: kelly
+    ttl: 3600000

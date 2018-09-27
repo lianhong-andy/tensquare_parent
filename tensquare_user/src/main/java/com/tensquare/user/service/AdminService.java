@@ -11,18 +11,22 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
+import javax.servlet.http.HttpServletRequest;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import util.IdWorker;
 
 import com.tensquare.user.dao.AdminDao;
 import com.tensquare.user.pojo.Admin;
+import util.JwtUtil;
 
 /**
  * 服务层
@@ -38,6 +42,15 @@ public class AdminService {
 	
 	@Autowired
 	private IdWorker idWorker;
+
+	@Autowired
+	private BCryptPasswordEncoder encoder;
+
+	@Autowired
+	private HttpServletRequest request;
+
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	/**
 	 * 查询全部列表
@@ -87,6 +100,8 @@ public class AdminService {
 	 */
 	public void add(Admin admin) {
 		admin.setId( idWorker.nextId()+"" );
+		//给密码进行加密
+		admin.setPassword(encoder.encode(admin.getPassword()));
 		adminDao.save(admin);
 	}
 
@@ -103,6 +118,11 @@ public class AdminService {
 	 * @param id
 	 */
 	public void deleteById(String id) {
+		//从域中取出对象判断是否有权限
+		Claims admin_claims = (Claims) request.getAttribute("admin_claims");
+		if(admin_claims==null) {
+			throw new RuntimeException("没有权限");
+		}
 		adminDao.deleteById(id);
 	}
 
@@ -142,4 +162,24 @@ public class AdminService {
 
 	}
 
+	/**
+	 * 管理员登录
+	 * 先根据用户名从数据库查询改用户是否存在，如果不存在表名没有该用户
+	 * 然后判断密码是否正确
+	 * @param admin
+	 * @return
+	 */
+	public Admin login(Admin admin) {
+		Admin loginAdmin = adminDao.findByLoginname(admin.getLoginname());
+		if(loginAdmin==null){
+			//用户名不存在
+			throw new RuntimeException("该用户名不存在");
+		}
+		if(admin.getLoginname()!=null&&encoder.matches(admin.getPassword(),loginAdmin.getPassword())){
+			//登录成功
+			return loginAdmin;
+		}
+		//登录失败
+		return null;
+	}
 }
