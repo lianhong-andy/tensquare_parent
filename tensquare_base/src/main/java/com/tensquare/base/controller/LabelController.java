@@ -6,9 +6,11 @@ import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -17,6 +19,8 @@ import java.util.List;
 public class LabelController {
     @Autowired
     private LabelService labelService;
+    @Autowired
+    private HttpServletRequest request;
 
     /**
      * 增加标签
@@ -26,7 +30,7 @@ public class LabelController {
     @RequestMapping(method = RequestMethod.POST)
     public Result addLabel(@RequestBody Label label){
         System.out.println(label);
-         labelService.addLabel(label);
+        labelService.addLabel(label);
         return new Result(true, StatusCode.OK,"添加成功");
     }
 
@@ -35,6 +39,8 @@ public class LabelController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public Result findAll(){
+        String header = request.getHeader("Authorization");
+        System.out.println(header);
         List<Label> list =  labelService.findAll();
         return new Result(true, StatusCode.OK,"查询成功",list);
     }
@@ -70,7 +76,7 @@ public class LabelController {
      */
     @RequestMapping(value = "/{labelId}",method = RequestMethod.DELETE)
     public Result deleteById(@PathVariable String labelId){
-        int i = 1/0;
+//        int i = 1/0;
         labelService.deleteById(labelId);
         return new Result(true, StatusCode.OK,"删除成功");
     }

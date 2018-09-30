@@ -1,4 +1,5 @@
-D:\tensquare_parent\tensquare_common\src\main\java\com\tensquare\entity\Result.java
-D:\tensquare_parent\tensquare_common\src\main\java\com\tensquare\entity\StatusCode.java
-D:\tensquare_parent\tensquare_common\src\main\java\com\tensquare\entity\PageResult.java
-D:\tensquare_parent\tensquare_common\src\main\java\com\tensquare\util\IdWorker.java
+G:\tensquare_parent\tensquare_common\src\main\java\entity\Result.java
+G:\tensquare_parent\tensquare_common\src\main\java\util\JwtUtil.java
+G:\tensquare_parent\tensquare_common\src\main\java\entity\StatusCode.java
+G:\tensquare_parent\tensquare_common\src\main\java\util\IdWorker.java
+G:\tensquare_parent\tensquare_common\src\main\java\entity\PageResult.java

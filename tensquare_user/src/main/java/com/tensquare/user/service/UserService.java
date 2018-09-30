@@ -2,7 +2,6 @@ package com.tensquare.user.service;
 
 import com.tensquare.user.dao.UserDao;
 import com.tensquare.user.pojo.User;
-import entity.Result;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import util.IdWorker;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Service
+@Transactional//开启事务
 public class UserService {
 
 	@Autowired
@@ -227,5 +228,18 @@ public class UserService {
 			return loginUser;
 		}
 		return null;
+	}
+
+	/**
+	 * 更新关注数/粉丝数
+	 * @param count
+	 * @param userid
+	 * @param friendid
+	 */
+	public void addFriend(int count,String userid,String friendid) {
+		//userid对应的用户关注数加count【followcount+count】
+		userDao.updateFollowById(count,userid);
+		//friendid对应的用户粉丝数加count【fanscount+count】
+		userDao.updateFansById(count,friendid);
 	}
 }

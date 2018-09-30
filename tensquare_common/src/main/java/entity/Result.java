@@ -8,6 +8,9 @@ public class Result implements Serializable {
     private String message;
     private Object data;
 
+    public Result() {
+    }
+
     public Result(boolean flag, Integer code, String message) {
         this.flag = flag;
         this.code = code;

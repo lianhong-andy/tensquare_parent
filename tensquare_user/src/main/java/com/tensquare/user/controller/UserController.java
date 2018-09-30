@@ -1,5 +1,6 @@
 package com.tensquare.user.controller;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,8 @@ import com.tensquare.user.service.UserService;
 import entity.PageResult;
 import entity.Result;
 import entity.StatusCode;
+import util.JwtUtil;
+
 /**
  * 控制器层
  * @author Administrator
@@ -39,6 +42,8 @@ public class UserController {
 	private RedisTemplate redisTemplate;
 	@Autowired
 	private RabbitTemplate rabbitTemplate;
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	
 	/**
@@ -152,7 +157,22 @@ public class UserController {
 		if(user==null){
 			return new Result(false,StatusCode.LOGINERROR,"登录失败");
 		}
-		return new Result(true,StatusCode.OK,"登录成功");
+		String token = jwtUtil.createJWT(user.getId(), user.getMobile(), "user");
+		Map map = new HashMap();
+		map.put("token",token);
+		map.put("name",user.getNickname());
+		return new Result(true,StatusCode.OK,"登录成功",map);
+	}
+
+	/**
+	 * 添加喜欢用户/添加不喜欢用户
+	 * @param userid
+	 * @param friendid
+	 * @return
+	 */
+	@RequestMapping(value = "/addFriend/{userid}/{friendid}/{count}",method = RequestMethod.PUT)
+	public void addFriend(@PathVariable String userid,@PathVariable String friendid,@PathVariable int count){
+		userService.addFriend(count,userid,friendid);
 	}
 
 	

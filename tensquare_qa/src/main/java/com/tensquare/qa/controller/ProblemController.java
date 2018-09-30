@@ -2,6 +2,7 @@ package com.tensquare.qa.controller;
 import java.util.List;
 import java.util.Map;
 
+import com.tensquare.qa.client.LabelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,9 @@ public class ProblemController {
 
 	@Autowired
 	private ProblemService problemService;
+
+	@Autowired
+	private LabelClient labelClient;
 	
 	
 	/**
@@ -144,5 +148,16 @@ public class ProblemController {
 			return new Result(true,StatusCode.OK,"没有该记录",list);
 		}
 	}
-	
+
+	/**
+	 * 通过标签id查找标签
+	 * @param labelId
+	 * @return
+	 */
+	@RequestMapping("/label/{labelId}")
+	public Result findLabelById(@PathVariable String labelId){
+		Result result = labelClient.findOne(labelId);
+		return result;
+	}
+
 }
